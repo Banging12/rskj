@@ -20,6 +20,7 @@
 package org.ethereum.core;
 
 import co.rsk.core.RskAddress;
+import co.rsk.crypto.Keccak256;
 import co.rsk.remasc.RemascTransaction;
 import co.rsk.util.MaxSizeHashMap;
 
@@ -28,7 +29,7 @@ import java.util.Map;
 
 public abstract class SignatureCache {
 
-    protected Map<Transaction, RskAddress> addressesCache; // TODO -> change indexes
+    protected Map<Keccak256, RskAddress> addressesCache;
 
     public SignatureCache(int maxCacheSize, boolean accessOrder) {
         addressesCache = Collections.synchronizedMap(
@@ -36,7 +37,7 @@ public abstract class SignatureCache {
     }
 
     public boolean containsTx(Transaction transaction) {
-        return addressesCache.containsKey(transaction);
+        return addressesCache.containsKey(transaction.getHash());
     }
 
     protected boolean mayAvoidSenderCompute(Transaction transaction) {
@@ -44,7 +45,7 @@ public abstract class SignatureCache {
             return true;
         }
 
-        RskAddress sender = addressesCache.get(transaction);
+        RskAddress sender = addressesCache.get(transaction.getHash());
         return sender != null;
     }
 

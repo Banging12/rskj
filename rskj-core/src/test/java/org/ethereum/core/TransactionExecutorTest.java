@@ -3,10 +3,12 @@ package org.ethereum.core;
 import co.rsk.config.VmConfig;
 import co.rsk.core.Coin;
 import co.rsk.core.RskAddress;
+import co.rsk.crypto.Keccak256;
 import org.ethereum.TestUtils;
 import org.ethereum.config.Constants;
 import org.ethereum.config.blockchain.upgrades.ActivationConfig;
 import org.ethereum.config.blockchain.upgrades.ActivationConfigsForTest;
+import org.ethereum.crypto.HashUtil;
 import org.ethereum.db.BlockStore;
 import org.ethereum.db.MutableRepository;
 import org.ethereum.db.ReceiptStore;
@@ -126,7 +128,7 @@ public class TransactionExecutorTest {
     }
 
     @Test
-    public void TwoTxsAreInBlockAndThemShouldBeContainedInCache(){
+    public void TwoTxsAreInBlockAndThemShouldBeContainedInCache() {
         ReceivedTxSignatureCache receivedTxSignatureCache = mock(ReceivedTxSignatureCache.class);
         BlockTxSignatureCache blockTxSignatureCache = new BlockTxSignatureCache(receivedTxSignatureCache);
         MutableRepository cacheTrack = mock(MutableRepository.class);
@@ -142,13 +144,13 @@ public class TransactionExecutorTest {
 
         when(repository.getNonce(sender)).thenReturn(BigInteger.valueOf(1L));
         when(repository.getBalance(sender)).thenReturn(new Coin(BigInteger.valueOf(68000L)));
-        Transaction transaction = getTransaction(sender, receiver, gasLimit, txNonce, gasPrice, value);
+        Transaction transaction = getTransaction(sender, receiver, gasLimit, txNonce, gasPrice, value, 1);
 
         assertTrue(executeValidTransaction(transaction, blockTxSignatureCache));
 
         when(repository.getNonce(sender2)).thenReturn(BigInteger.valueOf(1L));
         when(repository.getBalance(sender2)).thenReturn(new Coin(BigInteger.valueOf(68000L)));
-        Transaction transaction2 = getTransaction(sender2, receiver, gasLimit, txNonce, gasPrice, value);
+        Transaction transaction2 = getTransaction(sender2, receiver, gasLimit, txNonce, gasPrice, value, 2);
 
         assertTrue(executeValidTransaction(transaction2, blockTxSignatureCache));
 
@@ -269,7 +271,7 @@ public class TransactionExecutorTest {
 
         when(repository.getNonce(sender)).thenReturn(BigInteger.valueOf(1L));
         when(repository.getBalance(sender)).thenReturn(new Coin(BigInteger.valueOf(68000L)));
-        Transaction transaction = getTransaction(sender, receiver, gasLimit, txNonce, gasPrice, value);
+        Transaction transaction = getTransaction(sender, receiver, gasLimit, txNonce, gasPrice, value, -1);
         assertTrue(executeValidTransaction(transaction, blockTxSignatureCache));
 
         for (int i = 0; i < MAX_CACHE_SIZE; i++) {
@@ -279,7 +281,7 @@ public class TransactionExecutorTest {
             sender = new RskAddress(TestUtils.randomAddress().getBytes());
             when(repository.getNonce(sender)).thenReturn(BigInteger.valueOf(1L));
             when(repository.getBalance(sender)).thenReturn(new Coin(BigInteger.valueOf(68000L)));
-            Transaction transactionAux = getTransaction(sender, receiver, gasLimit, txNonce, gasPrice, value);
+            Transaction transactionAux = getTransaction(sender, receiver, gasLimit, txNonce, gasPrice, value, i);
             assertTrue(executeValidTransaction(transactionAux, blockTxSignatureCache));
         }
 
@@ -312,4 +314,11 @@ public class TransactionExecutorTest {
         when(transaction.getValue()).thenReturn(value);
         return transaction;
     }
+
+    private Transaction getTransaction(RskAddress sender, RskAddress receiver, byte[] gasLimit, byte[] txNonce, Coin gasPrice, Coin value, int hashSeed) {
+        Transaction transaction = getTransaction(sender, receiver, gasLimit, txNonce, gasPrice, value);
+        when(transaction.getHash()).thenReturn(new Keccak256(HashUtil.keccak256(BigInteger.valueOf(hashSeed).toByteArray())));
+        return transaction;
+    }
+
 }

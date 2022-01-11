@@ -40,14 +40,14 @@ public class BlockTxSignatureCache extends SignatureCache {
             return RemascTransaction.REMASC_ADDRESS;
         }
 
-        RskAddress address = addressesCache.get(transaction);
+        RskAddress address = addressesCache.get(transaction.getHash());
         if (address != null) {
             return address;
         }
 
         if (internalCache.containsTx(transaction)) {
             RskAddress sender = internalCache.getSender(transaction);
-            addressesCache.put(transaction, sender);
+            addressesCache.put(transaction.getHash(), sender);
             return sender;
         }
 
@@ -63,9 +63,9 @@ public class BlockTxSignatureCache extends SignatureCache {
 
         if (internalCache.containsTx(transaction)) {
             RskAddress sender = internalCache.getSender(transaction);
-            addressesCache.put(transaction, sender);
+            addressesCache.put(transaction.getHash(), sender);
         }
 
-        addressesCache.put(transaction, transaction.getSender());
+        addressesCache.put(transaction.getHash(), transaction.getSender());
     }
 }

@@ -37,7 +37,7 @@ public class ReceivedTxSignatureCache extends SignatureCache {
             return RemascTransaction.REMASC_ADDRESS;
         }
 
-        RskAddress address = addressesCache.get(transaction);
+        RskAddress address = addressesCache.get(transaction.getHash());
 
         if (address == null) {
             return transaction.getSender();
@@ -53,6 +53,6 @@ public class ReceivedTxSignatureCache extends SignatureCache {
             return;
         }
 
-        addressesCache.put(transaction, transaction.getSender());
+        addressesCache.put(transaction.getHash(), transaction.getSender());
     }
 }
