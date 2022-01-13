@@ -123,7 +123,7 @@ public class TransactionExecutorTest {
         Transaction transaction = getTransaction(sender, receiver, gasLimit, txNonce, gasPrice, value);
 
         assertTrue(executeValidTransaction(transaction, blockTxSignatureCache));
-        assertTrue(blockTxSignatureCache.containsTx(transaction));
+        assertNotNull(blockTxSignatureCache.getSender(transaction));
         assertArrayEquals(blockTxSignatureCache.getSender(transaction).getBytes(), sender.getBytes());
     }
 
@@ -154,10 +154,10 @@ public class TransactionExecutorTest {
 
         assertTrue(executeValidTransaction(transaction2, blockTxSignatureCache));
 
-        assertTrue(blockTxSignatureCache.containsTx(transaction));
+        assertNotNull(blockTxSignatureCache.getSender(transaction));
         assertArrayEquals(blockTxSignatureCache.getSender(transaction).getBytes(), sender.getBytes());
 
-        assertTrue(blockTxSignatureCache.containsTx(transaction2));
+        assertNotNull(blockTxSignatureCache.getSender(transaction2));
         assertArrayEquals(blockTxSignatureCache.getSender(transaction2).getBytes(), sender2.getBytes());
     }
 
@@ -191,7 +191,7 @@ public class TransactionExecutorTest {
 
         assertEquals(0, transaction.transactionCost(constants, activationConfig.forBlock(executionBlock.getNumber())));
         assertFalse(txExecutor.executeTransaction());
-        assertFalse(blockTxSignatureCache.containsTx(transaction));
+        assertNotNull(blockTxSignatureCache.getSender(transaction));
     }
 
     @Test
@@ -224,7 +224,7 @@ public class TransactionExecutorTest {
 
         assertEquals(0, transaction.transactionCost(constants, activationConfig.forBlock(executionBlock.getNumber())));
         assertFalse(txExecutor.executeTransaction());
-        assertFalse(blockTxSignatureCache.containsTx(transaction));
+        assertNotNull(blockTxSignatureCache.getSender(transaction));
     }
 
     @Test
@@ -246,7 +246,6 @@ public class TransactionExecutorTest {
         when(repository.getBalance(sender)).thenReturn(new Coin(BigInteger.valueOf(68000L)));
         Transaction transaction = getTransaction(sender, receiver, gasLimit, txNonce, gasPrice, value);
         when(receivedTxSignatureCache.getSender(transaction)).thenReturn(sender);
-        when(receivedTxSignatureCache.containsTx(transaction)).thenReturn(true);
 
         assertTrue(executeValidTransaction(transaction, blockTxSignatureCache));
         assertTrue(executeValidTransaction(transaction, blockTxSignatureCache)); //Execute two times the same tx
@@ -276,7 +275,7 @@ public class TransactionExecutorTest {
 
         for (int i = 0; i < MAX_CACHE_SIZE; i++) {
             if (i == MAX_CACHE_SIZE - 1) {
-                assertTrue(blockTxSignatureCache.containsTx(transaction));
+                assertNotNull(blockTxSignatureCache.getSender(transaction));
             }
             sender = new RskAddress(TestUtils.randomAddress().getBytes());
             when(repository.getNonce(sender)).thenReturn(BigInteger.valueOf(1L));
@@ -285,7 +284,7 @@ public class TransactionExecutorTest {
             assertTrue(executeValidTransaction(transactionAux, blockTxSignatureCache));
         }
 
-        assertFalse(blockTxSignatureCache.containsTx(transaction));
+        assertNotNull(blockTxSignatureCache.getSender(transaction));
     }
 
     private boolean executeValidTransaction(Transaction transaction, BlockTxSignatureCache blockTxSignatureCache) {

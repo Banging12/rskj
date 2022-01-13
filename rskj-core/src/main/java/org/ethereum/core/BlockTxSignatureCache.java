@@ -45,8 +45,8 @@ public class BlockTxSignatureCache extends SignatureCache {
             return address;
         }
 
-        if (internalCache.containsTx(transaction)) {
-            RskAddress sender = internalCache.getSender(transaction);
+        RskAddress sender = internalCache.getSender(transaction);
+        if (sender != null) {
             addressesCache.put(transaction.getHash(), sender);
             return sender;
         }
@@ -61,8 +61,8 @@ public class BlockTxSignatureCache extends SignatureCache {
             return;
         }
 
-        if (internalCache.containsTx(transaction)) {
-            RskAddress sender = internalCache.getSender(transaction);
+        RskAddress sender = internalCache.getSender(transaction);
+        if (sender != null) {
             addressesCache.put(transaction.getHash(), sender);
         }
 

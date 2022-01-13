@@ -36,10 +36,6 @@ public abstract class SignatureCache {
                 new MaxSizeHashMap<>(maxCacheSize, accessOrder));
     }
 
-    public boolean containsTx(Transaction transaction) {
-        return addressesCache.containsKey(transaction.getHash());
-    }
-
     protected boolean mayAvoidSenderCompute(Transaction transaction) {
         if (transaction instanceof RemascTransaction) {
             return true;
