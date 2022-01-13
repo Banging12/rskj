@@ -36,7 +36,7 @@ public abstract class SignatureCache {
                 new MaxSizeHashMap<>(maxCacheSize, accessOrder));
     }
 
-    protected boolean mayAvoidSenderCompute(Transaction transaction) {
+    protected boolean maySkipSenderStore(Transaction transaction) {
         if (transaction instanceof RemascTransaction) {
             return true;
         }

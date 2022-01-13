@@ -49,7 +49,7 @@ public class ReceivedTxSignatureCache extends SignatureCache {
     @Override
     public synchronized void storeSender(Transaction transaction) {
 
-        if (mayAvoidSenderCompute(transaction)) {
+        if (maySkipSenderStore(transaction)) {
             return;
         }
 
