@@ -30,7 +30,7 @@ public abstract class SignatureCache {
 
     protected final Map<Keccak256, RskAddress> addressesCache;
 
-    public SignatureCache(int maxCacheSize, boolean accessOrder) {
+    protected SignatureCache(int maxCacheSize, boolean accessOrder) {
         addressesCache = new MaxSizeHashMap<>(maxCacheSize, accessOrder);
     }
 
