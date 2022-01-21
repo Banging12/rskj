@@ -24,16 +24,14 @@ import co.rsk.crypto.Keccak256;
 import co.rsk.remasc.RemascTransaction;
 import co.rsk.util.MaxSizeHashMap;
 
-import java.util.Collections;
 import java.util.Map;
 
 public abstract class SignatureCache {
 
-    protected Map<Keccak256, RskAddress> addressesCache;
+    protected final Map<Keccak256, RskAddress> addressesCache;
 
     public SignatureCache(int maxCacheSize, boolean accessOrder) {
-        addressesCache = Collections.synchronizedMap(
-                new MaxSizeHashMap<>(maxCacheSize, accessOrder));
+        addressesCache = new MaxSizeHashMap<>(maxCacheSize, accessOrder);
     }
 
     protected boolean maySkipSenderStore(Transaction transaction) {
