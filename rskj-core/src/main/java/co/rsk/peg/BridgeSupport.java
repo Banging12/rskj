@@ -1137,7 +1137,7 @@ public class BridgeSupport {
             if (!pegoutEntries.isEmpty()) {
                 ReleaseTransactionBuilder.BuildResult result = txBuilder.buildBatchedPegouts(pegoutEntries);
 
-                while (result.getResponseCode() == ReleaseTransactionBuilder.Response.EXCEED_MAX_TRANSACTION_SIZE) {
+                while (pegoutEntries.size() > 1 && result.getResponseCode() == ReleaseTransactionBuilder.Response.EXCEED_MAX_TRANSACTION_SIZE) {
                     int firstHalfSize = pegoutEntries.size() / 2;
                     pegoutEntries = pegoutEntries.subList(0, firstHalfSize);
                     result = txBuilder.buildBatchedPegouts(pegoutEntries);
@@ -1146,7 +1146,7 @@ public class BridgeSupport {
                 if (result.getResponseCode() != ReleaseTransactionBuilder.Response.SUCCESS) {
                     logger.warn(
                         "Couldn't build a pegout BTC tx for {} pending requests (total amount: {}), Reason: {}",
-                        pegoutEntries.size(),
+                        releaseRequestQueue.getEntries().size(),
                         totalPegoutValue,
                         result.getResponseCode());
                     return;
