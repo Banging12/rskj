@@ -15,8 +15,20 @@ public class FastBridgeRegisterTestConfigurer {
     private final boolean includeActiveFederation;
     private final boolean includeRetiringFederation;
     private final boolean retiringFederationExists;
+    private final boolean surpassesLockingCap;
+    private final boolean shouldTransfer;
 
-    FastBridgeRegisterTestConfigurer(BridgeConstants bridgeConstants, ActivationConfig.ForBlock activations, BtcTransaction btcTx, List<Coin> valuesToSend, boolean includeActiveFederation, boolean includeRetiringFederation, boolean retiringFederationExists) {
+    FastBridgeRegisterTestConfigurer(
+        BridgeConstants bridgeConstants,
+        ActivationConfig.ForBlock activations,
+        BtcTransaction btcTx,
+        List<Coin> valuesToSend,
+        boolean includeActiveFederation,
+        boolean includeRetiringFederation,
+        boolean retiringFederationExists,
+        boolean surpassesLockingCap,
+        boolean shouldTransfer
+    ) {
         this.bridgeConstants = bridgeConstants;
         this.activations = activations;
         this.btcTx = btcTx;
@@ -24,6 +36,8 @@ public class FastBridgeRegisterTestConfigurer {
         this.includeActiveFederation = includeActiveFederation;
         this.includeRetiringFederation = includeRetiringFederation;
         this.retiringFederationExists = retiringFederationExists;
+        this.surpassesLockingCap = surpassesLockingCap;
+        this.shouldTransfer = shouldTransfer;
     }
 
     public BridgeConstants getBridgeConstants() {
@@ -54,6 +68,14 @@ public class FastBridgeRegisterTestConfigurer {
         return retiringFederationExists;
     }
 
+    public boolean isSurpassesLockingCap() {
+        return surpassesLockingCap;
+    }
+
+    public boolean isShouldTransfer() {
+        return shouldTransfer;
+    }
+
     static public class Builder {
         private BridgeConstants bridgeConstants;
         private ActivationConfig.ForBlock activations;
@@ -62,6 +84,8 @@ public class FastBridgeRegisterTestConfigurer {
         private boolean includeActiveFederation = false;
         private boolean includeRetiringFederation = false;
         private boolean retiringFederationExists = false;
+        private boolean surpassesLockingCap = false;
+        private boolean shouldTransfer = false;
 
         public Builder setBridgeConstants(BridgeConstants bridgeConstants) {
             this.bridgeConstants = bridgeConstants;
@@ -98,6 +122,16 @@ public class FastBridgeRegisterTestConfigurer {
             return this;
         }
 
+        public Builder setSurpassesLockingCap(boolean surpassesLockingCap) {
+            this.surpassesLockingCap = surpassesLockingCap;
+            return this;
+        }
+
+        public Builder setShouldTransfer(boolean shouldTransfer) {
+            this.shouldTransfer = shouldTransfer;
+            return this;
+        }
+
         public FastBridgeRegisterTestConfigurer createFastBridgeRegisterTestConfigurer() {
             return new FastBridgeRegisterTestConfigurer(
                 bridgeConstants,
@@ -106,7 +140,9 @@ public class FastBridgeRegisterTestConfigurer {
                 valuesToSend,
                 includeActiveFederation,
                 includeRetiringFederation,
-                retiringFederationExists
+                retiringFederationExists,
+                surpassesLockingCap,
+                shouldTransfer
             );
         }
     }
