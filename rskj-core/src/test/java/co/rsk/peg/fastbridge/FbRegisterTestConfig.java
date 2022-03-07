@@ -7,7 +7,7 @@ import org.ethereum.config.blockchain.upgrades.ActivationConfig;
 
 import java.util.List;
 
-public class FastBridgeRegisterTestConfigurer {
+public class FbRegisterTestConfig {
     private final BridgeConstants bridgeConstants;
     private final ActivationConfig.ForBlock activations;
     private final BtcTransaction btcTx;
@@ -18,7 +18,7 @@ public class FastBridgeRegisterTestConfigurer {
     private final boolean surpassesLockingCap;
     private final boolean shouldTransfer;
 
-    FastBridgeRegisterTestConfigurer(
+    FbRegisterTestConfig(
         BridgeConstants bridgeConstants,
         ActivationConfig.ForBlock activations,
         BtcTransaction btcTx,
@@ -56,23 +56,23 @@ public class FastBridgeRegisterTestConfigurer {
         return valuesToSend;
     }
 
-    public boolean isIncludeActiveFederation() {
+    public boolean includeActiveFederation() {
         return includeActiveFederation;
     }
 
-    public boolean isIncludeRetiringFederation() {
+    public boolean includeRetiringFederation() {
         return includeRetiringFederation;
     }
 
-    public boolean isRetiringFederationExists() {
+    public boolean retiringFederationExists() {
         return retiringFederationExists;
     }
 
-    public boolean isSurpassesLockingCap() {
+    public boolean surpassesLockingCap() {
         return surpassesLockingCap;
     }
 
-    public boolean isShouldTransfer() {
+    public boolean shouldTransfer() {
         return shouldTransfer;
     }
 
@@ -85,7 +85,7 @@ public class FastBridgeRegisterTestConfigurer {
         private boolean includeRetiringFederation = false;
         private boolean retiringFederationExists = false;
         private boolean surpassesLockingCap = false;
-        private boolean shouldTransfer = false;
+        private boolean shouldTransfer = true;
 
         public Builder setBridgeConstants(BridgeConstants bridgeConstants) {
             this.bridgeConstants = bridgeConstants;
@@ -132,8 +132,8 @@ public class FastBridgeRegisterTestConfigurer {
             return this;
         }
 
-        public FastBridgeRegisterTestConfigurer createFastBridgeRegisterTestConfigurer() {
-            return new FastBridgeRegisterTestConfigurer(
+        public FbRegisterTestConfig createFastBridgeRegisterTestConfigurer() {
+            return new FbRegisterTestConfig(
                 bridgeConstants,
                 activations,
                 btcTx,
