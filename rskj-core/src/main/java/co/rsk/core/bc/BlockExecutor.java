@@ -31,7 +31,6 @@ import com.google.common.annotations.VisibleForTesting;
 import org.ethereum.config.blockchain.upgrades.ActivationConfig;
 import org.ethereum.config.blockchain.upgrades.ConsensusRule;
 import org.ethereum.core.*;
-import org.ethereum.db.WrapperMutableRepository;
 import org.ethereum.vm.DataWord;
 import org.ethereum.vm.GasCost;
 import org.ethereum.vm.PrecompiledContracts;
@@ -458,8 +457,8 @@ public class BlockExecutor {
         // the state prior execution again.
         Metric metric = profiler.start(Profiler.PROFILING_TYPE.BLOCK_EXECUTE);
 
-        Repository track = repositoryLocator.startTrackingAt(parent);
         ReadWrittenKeysTracker readWrittenKeysTracker = new ReadWrittenKeysTracker();
+        Repository track = repositoryLocator.startTrackingAt(parent, readWrittenKeysTracker);
 
         maintainPrecompiledContractStorageRoots(track, activationConfig.forBlock(block.getNumber()));
 
@@ -469,7 +468,6 @@ public class BlockExecutor {
         List<TransactionReceipt> receipts = new ArrayList<>();
         List<Transaction> executedTransactions = new ArrayList<>();
         Set<DataWord> deletedAccounts = new HashSet<>();
-        WrapperMutableRepository wrapperMutableRepository = new WrapperMutableRepository(track, readWrittenKeysTracker);
         int buckets = 2;
         ParallelizeTransactionHandler parallelizeTransactionHandler = new ParallelizeTransactionHandler(buckets, GasCost.toGas(block.getGasLimit()));
 
@@ -482,7 +480,7 @@ public class BlockExecutor {
                     tx,
                     txindex++,
                     block.getCoinbase(),
-                    wrapperMutableRepository,
+                    track,
                     block,
                     totalGasUsed,
                     vmTrace,
