@@ -29,6 +29,7 @@ import org.junit.rules.TemporaryFolder;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.ethereum.TestUtils.randomBytes;
 import static org.hamcrest.Matchers.equalTo;
@@ -91,7 +92,7 @@ public class RocksDbDataSourceTest {
         RocksDbDataSource.mergeDataSources(destination, sourcePaths);
         KeyValueDataSource destinationDataSource = RocksDbDataSource.makeDataSource(destination);
         try {
-            Set<byte[]> destinationKeys = destinationDataSource.keys();
+            Set<byte[]> destinationKeys = destinationDataSource.keys().stream().map(ByteArrayWrapper::getData).collect(Collectors.toSet());
             Assert.assertThat(destinationKeys, hasSize(sourcesCount));
 
             for (byte[] destinationKey : destinationKeys) {
