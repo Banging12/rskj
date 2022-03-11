@@ -237,7 +237,7 @@ public class RocksDbDataSource implements KeyValueDataSource {
     }
 
     @Override
-    public Set<byte[]> keys() {
+    public Set<ByteArrayWrapper> keys() {
         Metric metric = profiler.start(Profiler.PROFILING_TYPE.DB_READ);
         resetDbLock.readLock().lock();
         try {
@@ -246,9 +246,9 @@ public class RocksDbDataSource implements KeyValueDataSource {
             }
 
             try (RocksIterator iterator = db.newIterator()) {
-                Set<byte[]> result = new HashSet<>();
+                Set<ByteArrayWrapper> result = new HashSet<>();
                 for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-                    result.add(iterator.key());
+                    result.add(ByteUtil.wrap(iterator.key()));
                 }
                 if (logger.isTraceEnabled()) {
                     logger.trace("<~ RocksDbDataSource.keys(): {}, {}", name, result.size());
@@ -352,8 +352,8 @@ public class RocksDbDataSource implements KeyValueDataSource {
         Map<ByteArrayWrapper, byte[]> mergedStores = new HashMap<>();
         for (Path originPath : originPaths) {
             KeyValueDataSource singleOriginDataSource = makeDataSource(originPath);
-            for (byte[] key : singleOriginDataSource.keys()) {
-                mergedStores.put(ByteUtil.wrap(key), singleOriginDataSource.get(key));
+            for (ByteArrayWrapper key : singleOriginDataSource.keys()) {
+                mergedStores.put(key, singleOriginDataSource.get(key.getData()));
             }
             singleOriginDataSource.close();
         }
