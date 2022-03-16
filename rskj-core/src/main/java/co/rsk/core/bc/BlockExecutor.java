@@ -465,8 +465,7 @@ public class BlockExecutor {
         int i = 1;
         long totalGasUsed = 0;
         Coin totalPaidFees = Coin.ZERO;
-        List<TransactionReceipt> receipts = new ArrayList<>();
-        List<Transaction> executedTransactions = new ArrayList<>();
+        Map<Transaction, TransactionReceipt> receiptsByTx = new HashMap<>();
         Set<DataWord> deletedAccounts = new HashSet<>();
         int buckets = 2;
         ParallelizeTransactionHandler parallelizeTransactionHandler = new ParallelizeTransactionHandler(buckets, GasCost.toGas(block.getGasLimit()));
@@ -475,6 +474,17 @@ public class BlockExecutor {
 
         for (Transaction tx : block.getTransactionsList()) {
             logger.trace("apply block: [{}] tx: [{}] ", block.getNumber(), i);
+            if (!parallelizeTransactionHandler.sequentialBucketHasGasAvailable(tx)) {
+                if (discardInvalidTxs) {
+                    logger.warn("block: [{}] discarded tx: [{}]", block.getNumber(), tx.getHash());
+                    continue;
+                } else {
+                    logger.warn("block: [{}] execution interrupted because of invalid tx: [{}]",
+                            block.getNumber(), tx.getHash());
+                    profiler.stop(metric);
+                    return BlockResult.INTERRUPTED_EXECUTION_BLOCK_RESULT;
+                }
+            }
 
             TransactionExecutor txExecutor = transactionExecutorFactory.newInstance(
                     tx,
@@ -500,9 +510,8 @@ public class BlockExecutor {
                 }
             }
 
-            parallelizeTransactionHandler.addTransaction(tx, readWrittenKeysTracker.getTemporalReadKeys(), readWrittenKeysTracker.getTemporalWrittenKeys(), txExecutor.getGasUsed());
+            Optional<Short> bucketId = parallelizeTransactionHandler.addTransaction(tx, readWrittenKeysTracker.getTemporalReadKeys(), readWrittenKeysTracker.getTemporalWrittenKeys(), txExecutor.getGasUsed());
             readWrittenKeysTracker.clear();
-            executedTransactions.add(tx);
 
             if (this.registerProgramResults) {
                 this.transactionResults.put(tx.getHash(), txExecutor.getResult());
@@ -519,7 +528,9 @@ public class BlockExecutor {
             logger.trace("track commit");
 
             long gasUsed = txExecutor.getGasUsed();
-            totalGasUsed += gasUsed;
+            long totalGasUsedInBucket = parallelizeTransactionHandler.getGasUsedIn(bucketId.get());
+
+            totalGasUsedInBucket += gasUsed;
             Coin paidFees = txExecutor.getPaidFees();
             if (paidFees != null) {
                 totalPaidFees = totalPaidFees.add(paidFees);
@@ -529,7 +540,7 @@ public class BlockExecutor {
 
             TransactionReceipt receipt = new TransactionReceipt();
             receipt.setGasUsed(gasUsed);
-            receipt.setCumulativeGas(totalGasUsed);
+            receipt.setCumulativeGas(totalGasUsedInBucket);
 
             receipt.setTxStatus(txExecutor.getReceipt().isSuccessful());
             receipt.setTransaction(tx);
@@ -542,7 +553,7 @@ public class BlockExecutor {
 
             i++;
 
-            receipts.add(receipt);
+            receiptsByTx.put(tx, receipt);
 
             logger.trace("tx done");
         }
@@ -555,10 +566,20 @@ public class BlockExecutor {
         }
 
         logger.trace("Building execution results.");
+
+        List<Transaction> executedTransactions = parallelizeTransactionHandler.getTransactionsInOrder();
+        List<Integer> bucketOrder = parallelizeTransactionHandler.getBucketOrder();
+        List<TransactionReceipt> receipts = new ArrayList<>();
+
+        for (Transaction tx : executedTransactions) {
+            receipts.add(receiptsByTx.get(tx));
+        }
+
         BlockResult result = new BlockResult(
                 block,
                 executedTransactions,
                 receipts,
+                bucketOrder,
                 totalGasUsed,
                 totalPaidFees,
                 vmTrace ? null : track.getTrie()
