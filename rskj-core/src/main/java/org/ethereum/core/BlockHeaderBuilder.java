@@ -57,7 +57,7 @@ public class BlockHeaderBuilder {
     private byte[] bitcoinMergedMiningCoinbaseTransaction;
     private byte[] mergedMiningForkDetectionData;
     private byte[] ummRoot;
-    private short[] txExecutionListsEdges;
+    private short[] txExecutionListEdges;
 
     private Coin minimumGasPrice;
     private int uncleCount;
@@ -92,7 +92,7 @@ public class BlockHeaderBuilder {
         this.createParallelCompliantHeader = createParallelCompliantHeader;
 
         if (!createParallelCompliantHeader) {
-            this.txExecutionListsEdges = null;
+            this.txExecutionListEdges = null;
         }
         return this;
     }
@@ -264,13 +264,13 @@ public class BlockHeaderBuilder {
         return this;
     }
 
-    public BlockHeaderBuilder setTxExecutionListsEdges(short[] edges) {
+    public BlockHeaderBuilder setTxExecutionListEdges(short[] edges) {
         if (edges != null) {
-            this.txExecutionListsEdges = new short[edges.length];
-            System.arraycopy(edges, 0, this.txExecutionListsEdges, 0, edges.length);
+            this.txExecutionListEdges = new short[edges.length];
+            System.arraycopy(edges, 0, this.txExecutionListEdges, 0, edges.length);
             this.createParallelCompliantHeader = true;
         } else {
-            this.txExecutionListsEdges = null;
+            this.txExecutionListEdges = null;
             this.createParallelCompliantHeader = false;
         }
         return this;
@@ -334,8 +334,8 @@ public class BlockHeaderBuilder {
         }
 
         if (createParallelCompliantHeader) {
-            if (txExecutionListsEdges == null) {
-                txExecutionListsEdges = new short[0];
+            if (txExecutionListEdges == null) {
+                txExecutionListEdges = new short[0];
             }
         }
 
@@ -350,7 +350,7 @@ public class BlockHeaderBuilder {
                 mergedMiningForkDetectionData,
                 minimumGasPrice, uncleCount,
                 false, useRskip92Encoding,
-                includeForkDetectionData, ummRoot, txExecutionListsEdges
+                includeForkDetectionData, ummRoot, txExecutionListEdges
         );
     }
 }

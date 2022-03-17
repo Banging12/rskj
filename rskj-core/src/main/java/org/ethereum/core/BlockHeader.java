@@ -106,7 +106,7 @@ public class BlockHeader {
     private byte[] miningForkDetectionData;
 
     /* Edges of the transaction execution lists */
-    private short[] txExecutionListsEdges;
+    private short[] txExecutionListEdges;
 
     private final byte[] ummRoot;
 
@@ -135,7 +135,7 @@ public class BlockHeader {
                        byte[] bitcoinMergedMiningCoinbaseTransaction, byte[] mergedMiningForkDetectionData,
                        Coin minimumGasPrice, int uncleCount, boolean sealed,
                        boolean useRskip92Encoding, boolean includeForkDetectionData, byte[] ummRoot,
-                       short[] txExecutionListsEdges) {
+                       short[] txExecutionListEdges) {
         this.parentHash = parentHash;
         this.unclesHash = unclesHash;
         this.coinbase = coinbase;
@@ -161,7 +161,7 @@ public class BlockHeader {
         this.useRskip92Encoding = useRskip92Encoding;
         this.includeForkDetectionData = includeForkDetectionData;
         this.ummRoot = ummRoot != null ? Arrays.copyOf(ummRoot, ummRoot.length) : null;
-        this.txExecutionListsEdges = txExecutionListsEdges;
+        this.txExecutionListEdges = txExecutionListEdges;
     }
 
     @VisibleForTesting
@@ -378,9 +378,9 @@ public class BlockHeader {
             fieldToEncodeList.add(RLP.encodeElement(this.ummRoot));
         }
 
-        if (this.txExecutionListsEdges != null) {
-            byte[] edgesBytes = new byte[this.txExecutionListsEdges.length * 2];
-            ByteBuffer.wrap(edgesBytes).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().put(this.txExecutionListsEdges);
+        if (this.txExecutionListEdges != null) {
+            byte[] edgesBytes = new byte[this.txExecutionListEdges.length * 2];
+            ByteBuffer.wrap(edgesBytes).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().put(this.txExecutionListEdges);
             fieldToEncodeList.add(RLP.encodeElement(edgesBytes));
         }
 
@@ -460,7 +460,7 @@ public class BlockHeader {
         toStringBuff.append("  timestamp=").append(timestamp).append(" (").append(Utils.longToDateTime(timestamp)).append(")").append(suffix);
         toStringBuff.append("  extraData=").append(toHexStringOrEmpty(extraData)).append(suffix);
         toStringBuff.append("  minGasPrice=").append(minimumGasPrice).append(suffix);
-        toStringBuff.append("  txExecutionListsEdges=").append(txExecutionListsEdges).append(suffix);
+        toStringBuff.append("  txExecutionListsEdges=").append(txExecutionListEdges).append(suffix);
 
         return toStringBuff.toString();
     }
@@ -626,5 +626,9 @@ public class BlockHeader {
         return ummRoot != null ? Arrays.copyOf(ummRoot, ummRoot.length) : null;
     }
 
-    public short[] getTxExecutionListsEdges() { return this.txExecutionListsEdges; }
+    public short[] getTxExecutionListEdges() { return this.txExecutionListEdges; }
+
+    public void setTxExecutionListEdges(short[] bucketOrder) {
+        this.txExecutionListEdges = bucketOrder;
+    }
 }

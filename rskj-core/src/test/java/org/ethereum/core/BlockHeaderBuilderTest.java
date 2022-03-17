@@ -438,7 +438,7 @@ public class BlockHeaderBuilderTest {
                 .setCreateParallelCompliantHeader(true)
                 .build();
 
-        assertArrayEquals(new short[0], header.getTxExecutionListsEdges());
+        assertArrayEquals(new short[0], header.getTxExecutionListEdges());
     }
 
     @Test
@@ -449,7 +449,7 @@ public class BlockHeaderBuilderTest {
                 .setCreateParallelCompliantHeader(false)
                 .build();
 
-        assertArrayEquals(null, header.getTxExecutionListsEdges());
+        assertArrayEquals(null, header.getTxExecutionListEdges());
     }
 
     @Test
@@ -458,10 +458,10 @@ public class BlockHeaderBuilderTest {
         short[] edges = TestUtils.randomShortArray(4);
 
         BlockHeader header = builder
-                .setTxExecutionListsEdges(edges)
+                .setTxExecutionListEdges(edges)
                 .build();
 
-        assertArrayEquals(edges, header.getTxExecutionListsEdges());
+        assertArrayEquals(edges, header.getTxExecutionListEdges());
     }
 
     @Test
@@ -469,10 +469,10 @@ public class BlockHeaderBuilderTest {
         BlockHeaderBuilder builder = new BlockHeaderBuilder(ActivationConfigsForTest.all());
 
         BlockHeader header = builder
-                .setTxExecutionListsEdges(null)
+                .setTxExecutionListEdges(null)
                 .build();
 
-        assertArrayEquals(null, header.getTxExecutionListsEdges());
+        assertArrayEquals(null, header.getTxExecutionListEdges());
     }
 
     @Test
@@ -480,11 +480,11 @@ public class BlockHeaderBuilderTest {
         BlockHeaderBuilder builder = new BlockHeaderBuilder(ActivationConfigsForTest.all());
 
         BlockHeader header = builder
-                .setTxExecutionListsEdges(null)
+                .setTxExecutionListEdges(null)
                 .setCreateParallelCompliantHeader(true)
                 .build();
 
-        assertArrayEquals(new short[0], header.getTxExecutionListsEdges());
+        assertArrayEquals(new short[0], header.getTxExecutionListEdges());
     }
 
     @Test
@@ -494,10 +494,10 @@ public class BlockHeaderBuilderTest {
 
         BlockHeader header = builder
                 .setCreateParallelCompliantHeader(false)
-                .setTxExecutionListsEdges(edges)
+                .setTxExecutionListEdges(edges)
                 .build();
 
-        assertArrayEquals(edges, header.getTxExecutionListsEdges());
+        assertArrayEquals(edges, header.getTxExecutionListEdges());
     }
 
     @Test
@@ -506,11 +506,11 @@ public class BlockHeaderBuilderTest {
         short[] edges = TestUtils.randomShortArray(4);
 
         BlockHeader header = builder
-                .setTxExecutionListsEdges(edges)
+                .setTxExecutionListEdges(edges)
                 .setCreateParallelCompliantHeader(false)
                 .build();
 
-        assertArrayEquals(null, header.getTxExecutionListsEdges());
+        assertArrayEquals(null, header.getTxExecutionListEdges());
     }
 
     @Test
@@ -519,9 +519,9 @@ public class BlockHeaderBuilderTest {
 
         BlockHeader header = builder
                 .setCreateParallelCompliantHeader(true)
-                .setTxExecutionListsEdges(null)
+                .setTxExecutionListEdges(null)
                 .build();
 
-        assertArrayEquals(null, header.getTxExecutionListsEdges());
+        assertArrayEquals(null, header.getTxExecutionListEdges());
     }
 }

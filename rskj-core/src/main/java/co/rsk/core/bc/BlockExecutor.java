@@ -150,6 +150,7 @@ public class BlockExecutor {
         header.setGasUsed(result.getGasUsed());
         header.setPaidFees(result.getPaidFees());
         header.setLogsBloom(calculateLogsBloom(result.getTransactionReceipts()));
+        header.setTxExecutionListEdges(result.getBucketOrder());
 
         block.flushRLP();
         profiler.stop(metric);
@@ -291,7 +292,7 @@ public class BlockExecutor {
             boolean discardInvalidTxs,
             boolean acceptInvalidTransactions) {
 
-        if (block.getHeader().getTxExecutionListsEdges() != null) {
+        if (block.getHeader().getTxExecutionListEdges() != null) {
             return executeParallel(programTraceProcessor, vmTraceOptions, block, parent, discardInvalidTxs, acceptInvalidTransactions);
         } else {
             return executeSequential(programTraceProcessor, vmTraceOptions, block, parent, discardInvalidTxs, acceptInvalidTransactions);
@@ -338,7 +339,7 @@ public class BlockExecutor {
 
         // execute parallel subsets of transactions
         short start = 0;
-        for (short end : block.getHeader().getTxExecutionListsEdges()) {
+        for (short end : block.getHeader().getTxExecutionListEdges()) {
             List<Transaction> sublist = block.getTransactionsList().subList(start, end);
             TransactionListExecutor txListExecutor = new TransactionListExecutor(
                     sublist,
@@ -424,6 +425,7 @@ public class BlockExecutor {
                 block,
                 new LinkedList(executedTransactions.values()),
                 new LinkedList(receipts.values()),
+                new short[0],
                 totalGasUsed.longValue(),
                 Coin.valueOf(totalPaidFees.longValue()),
                 vmTrace ? null : track.getTrie()
@@ -574,7 +576,7 @@ public class BlockExecutor {
         logger.trace("Building execution results.");
 
         List<Transaction> executedTransactions = parallelizeTransactionHandler.getTransactionsInOrder();
-        List<Integer> bucketOrder = parallelizeTransactionHandler.getBucketOrder();
+        short[] bucketOrder = parallelizeTransactionHandler.getBucketOrder();
         List<TransactionReceipt> receipts = new ArrayList<>();
 
         for (Transaction tx : executedTransactions) {
